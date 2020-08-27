@@ -59,7 +59,7 @@ public class Librarian extends javax.swing.JFrame {
         int c;
         
         try {
-            pst = con.prepareStatement("select * from Librarian");
+            pst = con.prepareStatement("select * from librarian");
             rs = pst.executeQuery();
             
             ResultSetMetaData rsd = rs.getMetaData();
@@ -273,12 +273,10 @@ public class Librarian extends javax.swing.JFrame {
                                             .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(btnUpdate, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addGap(0, 0, Short.MAX_VALUE)))))))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                    .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 488, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -286,7 +284,6 @@ public class Librarian extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 427, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(39, 39, 39)
@@ -318,7 +315,8 @@ public class Librarian extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(btnDelete, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 427, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -363,7 +361,7 @@ public class Librarian extends javax.swing.JFrame {
         String password = txtPassword.getText();
         
         try {
-            pst = con.prepareStatement("insert into Librarian(Name,Address,Contact_no,email,Password)values(?,?,?,?,?)");
+            pst = con.prepareStatement("insert into librarian(Name,Address,Contact_no,email,Password)values(?,?,?,?,?)");
             pst.setString(1,libName);
             pst.setString(2, address);
             pst.setString(3, contact);
@@ -440,7 +438,7 @@ public class Librarian extends javax.swing.JFrame {
         String password = txtPassword.getText();
         
         try {
-            pst = con.prepareStatement("update Librarian set Name = ?, Address = ?, Contact_no = ?, email = ?, Password = ? where Librarian_ID = ?");
+            pst = con.prepareStatement("update librarian set Name = ?, Address = ?, Contact_no = ?, email = ?, Password = ? where Librarian_ID = ?");
             pst.setString(1, libName);
             pst.setString(2, address);
             pst.setString(3, contact);
@@ -485,7 +483,7 @@ public class Librarian extends javax.swing.JFrame {
         
        
         try {
-            pst = con.prepareStatement("delete from Librarian where Librarian_ID = ?");
+            pst = con.prepareStatement("delete from librarian where Librarian_ID = ?");
        
             pst.setInt(1, Librarian_ID);
             
@@ -520,7 +518,7 @@ public class Librarian extends javax.swing.JFrame {
     private void btnSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchActionPerformed
         
         try {
-            pst = con.prepareStatement("select * from Librarian where Librarian_id = ?");
+            pst = con.prepareStatement("select * from librarian where Librarian_id = ?");
             int id = Integer.parseInt(txtID.getText());
                 pst.setInt(1, id);
                 ResultSet rs = pst.executeQuery();

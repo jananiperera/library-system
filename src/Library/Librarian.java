@@ -5,6 +5,14 @@
  */
 package Library;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Element;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
+import java.awt.print.PrinterException;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -16,50 +24,54 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import java.util.regex.*;
+import javax.swing.JFileChooser;
 
 /**
  *
  * @author HP
  */
 public class Librarian extends javax.swing.JFrame {
+    private Object tbl;
 
     /**
      * Creates new form Librarian
      */
     public Librarian() {
         initComponents();
-        Connect();
+        //Connect();
         Librarian_Load();
     }
 
     Connection con;
     PreparedStatement pst;
     ResultSet rs;
-    
-    
-    public void Connect()
-    {
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-                con = DriverManager.getConnection("jdbc:mysql://localhost/library", "root", "");
-                
-                 
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    
-    }
-    
-    
+  
     public void Librarian_Load()
     {
         int c;
         
         try {
-            pst = con.prepareStatement("select * from librarian");
+           DBConnection dc = new DBConnection();
+            try {
+                con = dc.getConnection();
+            } catch (Exception ex) {
+                Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                dc.getConnection();
+            } catch (Exception ex) {
+                Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                pst=dc.getConnection().prepareStatement("select * from librarian");
+            } catch (Exception ex) {
+                Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+            }
+             
+       
+        
+        
             rs = pst.executeQuery();
             
             ResultSetMetaData rsd = rs.getMetaData();
@@ -124,6 +136,7 @@ public class Librarian extends javax.swing.JFrame {
         txtID = new javax.swing.JTextField();
         btnSearch = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
+        btnPDF = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -230,6 +243,13 @@ public class Librarian extends javax.swing.JFrame {
             }
         });
 
+        btnPDF.setText("Generate PDF");
+        btnPDF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPDFActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -285,10 +305,12 @@ public class Librarian extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 86, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(71, 71, 71)
-                        .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(50, 50, 50)
+                        .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(39, 39, 39)
+                        .addComponent(btnPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 488, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addGap(12, 12, 12))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -333,7 +355,8 @@ public class Librarian extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(txtID, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(btnSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(btnClear, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(18, 18, 18))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 427, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -345,9 +368,9 @@ public class Librarian extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(25, 25, 25)
                 .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(203, 203, 203))
+                .addGap(249, 249, 249))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -376,6 +399,31 @@ public class Librarian extends javax.swing.JFrame {
         String email = txtEmail.getText();
         String password = txtPassword.getText();
         
+        if(libName.equals("")){
+            JOptionPane.showMessageDialog(null, "Name is Mandotory");
+        }
+        if(address.equals("")){
+            JOptionPane.showMessageDialog(null, "Address is Mandotory");
+        }
+        if(contact.equals("")){
+            JOptionPane.showMessageDialog(null, "Contact number is Mandotory");
+        }
+        if(email.equals("")){
+            JOptionPane.showMessageDialog(null, "Email is Mandotory");
+        }
+        if(email.equals("")){
+            JOptionPane.showMessageDialog(null, "Email is Mandotory");
+        }
+        String EMAIL_PATTERN = "^[a-zA-Z0-9]{1,20}@[a-zA-Z0-9]{1,20}.[a-zA-Z0-9]{2,3}$";
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher regexMatcher = pattern.matcher(txtEmail.getText());
+        if(!regexMatcher.matches()){
+            JOptionPane.showMessageDialog(null, "Email Format is incorrect");
+        }
+        if(password.equals("")){
+            JOptionPane.showMessageDialog(null, "Password is Mandotory");
+        }
+        
         try {
             pst = con.prepareStatement("insert into librarian(Name,Address,Contact_no,email,Password)values(?,?,?,?,?)");
             pst.setString(1,libName);
@@ -384,7 +432,7 @@ public class Librarian extends javax.swing.JFrame {
             pst.setString(4, email);
             pst.setString(5, password);
             int k = pst.executeUpdate();
-            
+         
             if(k== 1)
             {
                 JOptionPane.showMessageDialog(this, "Librarian Created");
@@ -402,7 +450,7 @@ public class Librarian extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Error");
                 
                 txtLibName.setText("");
-                 txtLibName.requestFocus();
+                txtLibName.requestFocus();
             }
             
             
@@ -572,6 +620,62 @@ public class Librarian extends javax.swing.JFrame {
         txtPassword.setText("");
     }//GEN-LAST:event_btnClearActionPerformed
 
+    private void btnPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPDFActionPerformed
+       String path="";
+       JFileChooser j =new JFileChooser();
+       j.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+       int x = j.showSaveDialog(this);
+       
+       if(x == JFileChooser.APPROVE_OPTION){
+           path = j.getSelectedFile().getPath();
+       }
+       
+       Document doc = new Document();
+       
+        try {
+            PdfWriter.getInstance(doc, new FileOutputStream(path+"Librarians_Details.pdf"));
+            
+            doc.open();
+            
+            PdfPTable tbl = new PdfPTable(6);
+            
+            //Adding headers
+            tbl.addCell("Librarian ID");
+            tbl.addCell("Name");
+            tbl.addCell("Address");
+            tbl.addCell("Contact_no");
+            tbl.addCell("email");
+            tbl.addCell("Password");
+            
+            for(int i=0;i<jTable1.getRowCount();i++) {
+            String id = jTable1.getValueAt(i, 0).toString();
+            String name = jTable1.getValueAt(i,1).toString();
+            String address = jTable1.getValueAt(i,2).toString();
+            String cont = jTable1.getValueAt(i,3).toString();
+            String email = jTable1.getValueAt(i,4).toString();
+            String password = jTable1.getValueAt(i,5).toString();
+            
+            tbl.addCell(id);
+            tbl.addCell(name);
+            tbl.addCell(address);
+            tbl.addCell(cont);
+            tbl.addCell(email);
+            tbl.addCell(password);
+            }
+            
+            doc.add(tbl);
+            JOptionPane.showMessageDialog(null, "Download pdf file", "ALERT MESSAGE", JOptionPane.WARNING_MESSAGE);
+           
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (DocumentException ex) {
+            Logger.getLogger(Librarian.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        doc.close();
+    }//GEN-LAST:event_btnPDFActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -598,7 +702,7 @@ public class Librarian extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Librarian.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
+        
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -612,6 +716,7 @@ public class Librarian extends javax.swing.JFrame {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnDelete;
+    private javax.swing.JButton btnPDF;
     private javax.swing.JButton btnSearch;
     private javax.swing.JButton btnUpdate;
     private javax.swing.JLabel jLabel1;
@@ -631,4 +736,6 @@ public class Librarian extends javax.swing.JFrame {
     private javax.swing.JTextField txtLibName;
     private javax.swing.JTextField txtPassword;
     // End of variables declaration//GEN-END:variables
+
+   
 }

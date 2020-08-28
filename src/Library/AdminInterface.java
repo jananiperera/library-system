@@ -150,9 +150,6 @@ public class AdminInterface extends javax.swing.JFrame {
 // TODO add your handling code here:
         Librarian l = new Librarian();
         l.setVisible(true);
-       /* Librarian lib = new Librarian();
-        this.hide();
-        lib.setVisible(true);*/
     }//GEN-LAST:event_librariansActionPerformed
 
     private void membersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_membersActionPerformed
